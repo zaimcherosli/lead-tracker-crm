@@ -1,0 +1,22 @@
+{
+  "name": "Lead Tracker CRM",
+  "short_name": "LeadCRM",
+  "description": "Premium Sales & Marketing Lead Tracker CRM",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#090d16",
+  "theme_color": "#8b5cf6",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "assets/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "assets/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]
+}

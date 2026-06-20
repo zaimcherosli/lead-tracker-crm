@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lead Tracker CRM - Premium Sales Companion</title>
+  
+  <!-- Tailwind CSS v3 Play CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f5f3ff',
+              100: '#ede9fe',
+              200: '#ddd6fe',
+              300: '#c4b5fd',
+              400: '#a78bfa',
+              500: '#8b5cf6',
+              600: '#7c3aed',
+              700: '#6d28d9',
+              800: '#5b21b6',
+              900: '#4c1d95',
+            },
+            slate: {
+              950: '#030712'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+          },
+          boxShadow: {
+            'glow-accent': '0 0 20px -3px rgba(139, 92, 246, 0.4)',
+            'glow-green': '0 0 20px -3px rgba(34, 197, 94, 0.4)',
+            'glow-red': '0 0 20px -3px rgba(239, 68, 68, 0.4)',
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- PWA Metadata & Mobile Capable -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icon-192.png">
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Free Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Custom Scrollbars & Utilities -->
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    /* Smooth Transitions */
+    .fade-in {
+      animation: fadeIn 0.25s ease-out forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    /* Custom thin scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .dark ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    /* Hide scrollbar for elements */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 min-h-screen transition-colors duration-250 antialiased overflow-x-hidden selection:bg-brand-500 selection:text-white">
+
+  <!-- ========================================== -->
+  <!-- LOGIN OVERLAY -->
+  <!-- ========================================== -->
+  <div id="login-overlay" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/90 dark:bg-slate-950/95 backdrop-blur-md hidden">
+    <div class="w-full max-w-md p-8 m-4 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl transition-all duration-350 transform scale-100">
+      <div class="text-center mb-8">
+        <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-brand-500/10 text-brand-500 mb-4">
+          <i class="fa-solid fa-chart-line text-3xl"></i>
+        </div>
+        <h2 class="text-2xl font-bold tracking-tight">Welcome Back</h2>
+        <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Lead Tracker CRM Portal</p>
+      </div>
+
+      <form id="login-form" class="space-y-5">
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Username</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+              <i class="fa-regular fa-user"></i>
+            </span>
+            <input type="text" id="login-username" required class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm" placeholder="Enter username">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Password / PIN</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+              <i class="fa-solid fa-lock"></i>
+            </span>
+            <input type="password" id="login-password" required class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm" placeholder="••••••••">
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between text-sm">
+          <label class="flex items-center space-x-2 cursor-pointer">
+            <input type="checkbox" id="login-remember" class="w-4 h-4 rounded text-brand-500 border-slate-300 dark:border-slate-700 bg-transparent focus:ring-brand-500">
+            <span class="text-slate-500 dark:text-slate-400">Remember Login</span>
+          </label>
+        </div>
+
+        <div id="login-error-msg" class="text-xs text-red-500 bg-red-500/10 p-3 rounded-lg hidden">
+          <i class="fa-solid fa-circle-exclamation mr-1"></i> Maklumat login tidak sah. Sila cuba lagi.
+        </div>
+
+        <button type="submit" class="w-full py-3 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-semibold text-sm transition-colors shadow-lg shadow-brand-600/30">
+          Sign In <i class="fa-solid fa-arrow-right-to-bracket ml-2"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MAIN APP CONTAINER -->
+  <!-- ========================================== -->
+  <div class="flex min-h-screen">
+
+    <!-- DESKTOP SIDEBAR -->
+    <aside class="hidden md:flex flex-col w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 shrink-0 sticky top-0 h-screen z-30">
+      <!-- Brand Logo -->
+      <div class="h-16 flex items-center px-6 border-b border-slate-200 dark:border-slate-800">
+        <a href="#dashboard" class="flex items-center space-x-2">
+          <i class="fa-solid fa-chart-line text-2xl text-brand-500"></i>
+          <span class="font-extrabold text-lg tracking-tight bg-gradient-to-r from-brand-500 to-indigo-500 bg-clip-text text-transparent">Lead Tracker CRM</span>
+        </a>
+      </div>
+
+      <!-- User Context -->
+      <div class="p-4 border-b border-slate-200 dark:border-slate-800">
+        <div class="flex items-center space-x-3 p-2 rounded-xl bg-slate-50 dark:bg-slate-950/50">
+          <div class="w-10 h-10 rounded-lg bg-brand-500/10 text-brand-500 flex items-center justify-center font-bold">
+            <span id="user-initials">ZH</span>
+          </div>
+          <div class="min-w-0">
+            <h4 id="user-profile-name" class="text-sm font-semibold truncate">Zaim Hartanah</h4>
+            <p id="user-profile-company" class="text-xs text-slate-500 dark:text-slate-400 truncate">Agency Owner</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
+        <a href="#dashboard" class="nav-item flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors hover:bg-slate-100 dark:hover:bg-slate-800/60 text-slate-600 dark:text-slate-400 hover:text-brand-500 dark:hover:text-slate-100" data-view="dashboard">
+          <i class="fa-solid fa-square-poll-vertical text-lg"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="#leads" class="nav-item flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors hover:bg-slate-100 dark:hover:bg-slate-800/60 text-slate-600 dark:text-slate-400 hover:text-brand-500 dark:hover:text-slate-100" data-view="leads">
+          <i class="fa-solid fa-address-book text-lg"></i>
+          <span>Leads Module</span>
+        </a>
+        <a href="#followups" class="nav-item flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors hover:bg-slate-100 dark:hover:bg-slate-800/60 text-slate-600 dark:text-slate-400 hover:text-brand-500 dark:hover:text-slate-100" data-view="followups">
+          <i class="fa-regular fa-calendar-check text-lg"></i>
+          <span>Follow Ups</span>
+        </a>
+        <a href="#analytics" class="nav-item flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors hover:bg-slate-100 dark:hover:bg-slate-800/60 text-slate-600 dark:text-slate-400 hover:text-brand-500 dark:hover:text-slate-100" data-view="analytics">
+          <i class="fa-solid fa-chart-pie text-lg"></i>
+          <span>Analytics</span>
+        </a>
+        <a href="#settings" class="nav-item flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors hover:bg-slate-100 dark:hover:bg-slate-800/60 text-slate-600 dark:text-slate-400 hover:text-brand-500 dark:hover:text-slate-100" data-view="settings">
+          <i class="fa-solid fa-gears text-lg"></i>
+          <span>Settings</span>
+        </a>
+      </nav>
+
+      <!-- Sync Info & Bottom Actions -->
+      <div class="p-4 border-t border-slate-200 dark:border-slate-800 space-y-3">
+        <button id="sidebar-sync-btn" class="w-full py-2.5 px-4 rounded-xl border border-brand-500/30 hover:border-brand-500 bg-brand-500/5 hover:bg-brand-500/10 text-brand-500 text-xs font-semibold transition-all flex items-center justify-center space-x-2">
+          <i class="fa-solid fa-rotate"></i>
+          <span>Sync Spreadsheet</span>
+        </button>
+        <div class="text-[10px] text-center text-slate-500 dark:text-slate-400">
+          Last Synced: <span id="sidebar-sync-time">Never</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MOBILE BOTTOM NAVIGATION -->
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 z-40 flex justify-around items-center px-2">
+      <a href="#dashboard" class="mobile-nav-item flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 hover:text-brand-500 transition-colors w-12" data-view="dashboard">
+        <i class="fa-solid fa-square-poll-vertical text-lg"></i>
+        <span class="text-[10px] mt-1">Home</span>
+      </a>
+      <a href="#leads" class="mobile-nav-item flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 hover:text-brand-500 transition-colors w-12" data-view="leads">
+        <i class="fa-solid fa-address-book text-lg"></i>
+        <span class="text-[10px] mt-1">Leads</span>
+      </a>
+      <a href="#followups" class="mobile-nav-item flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 hover:text-brand-500 transition-colors w-12" data-view="followups">
+        <i class="fa-regular fa-calendar-check text-lg"></i>
+        <span class="text-[10px] mt-1">Followup</span>
+      </a>
+      <a href="#analytics" class="mobile-nav-item flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 hover:text-brand-500 transition-colors w-12" data-view="analytics">
+        <i class="fa-solid fa-chart-pie text-lg"></i>
+        <span class="text-[10px] mt-1">Charts</span>
+      </a>
+      <a href="#settings" class="mobile-nav-item flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 hover:text-brand-500 transition-colors w-12" data-view="settings">
+        <i class="fa-solid fa-gears text-lg"></i>
+        <span class="text-[10px] mt-1">Setup</span>
+      </a>
+    </nav>
+
+    <!-- CONTENT DISPLAY FRAME -->
+    <main class="flex-1 flex flex-col min-w-0 pb-20 md:pb-6 bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100">
+      
+      <!-- TOP STATUS BAR / HEADER -->
+      <header class="h-16 flex items-center justify-between px-6 bg-white/70 dark:bg-slate-900/60 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800/80 sticky top-0 z-20">
+        <div class="flex items-center space-x-3">
+          <button id="mobile-sidebar-toggle" class="md:hidden text-slate-500 focus:outline-none">
+            <i class="fa-solid fa-bars text-xl"></i>
+          </button>
+          <h1 id="page-title" class="text-lg font-bold tracking-tight">Dashboard</h1>
+        </div>
+
+        <div class="flex items-center space-x-4">
+          <!-- Offline Sync Indicator -->
+          <span id="sync-status-badge" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-500">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></span> Offline Mode
+          </span>
+
+          <!-- Quick Add Lead Button -->
+          <button id="quick-add-lead-btn" class="bg-brand-600 hover:bg-brand-700 text-white p-2 md:px-4 md:py-2 rounded-xl text-xs md:text-sm font-semibold transition-all shadow-md shadow-brand-600/20 flex items-center space-x-1.5">
+            <i class="fa-solid fa-user-plus"></i>
+            <span class="hidden md:inline">Add Lead</span>
+          </button>
+
+          <!-- Theme Toggle -->
+          <button id="theme-toggle" class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-colors focus:outline-none">
+            <i class="fa-solid fa-moon dark:hidden text-lg"></i>
+            <i class="fa-solid fa-sun hidden dark:block text-lg"></i>
+          </button>
+
+          <!-- Logout Button -->
+          <button id="logout-btn" class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-red-500 flex items-center justify-center hover:bg-red-500/10 transition-colors focus:outline-none" title="Log Out">
+            <i class="fa-solid fa-power-off text-lg"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- VIEW PANELS (DYNAMICALLY SWITCHED BY ROUTER) -->
+      <div id="view-container" class="p-4 md:p-6 flex-1 max-w-7xl w-full mx-auto">
+        
+        <!-- ========================================== -->
+        <!-- 1. DASHBOARD VIEW -->
+        <!-- ========================================== -->
+        <section id="view-dashboard" class="view-panel hidden fade-in space-y-8">
+          <!-- Statistics Section -->
+          <div>
+            <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-4">Hari Ini (Today's Statistics)</h3>
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <!-- New Leads Card -->
+              <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 rounded-3xl relative overflow-hidden group hover:border-brand-500/50 transition-all shadow-sm">
+                <div class="flex items-center justify-between">
+                  <span class="text-sm font-medium text-slate-500 dark:text-slate-400">Leads Baru</span>
+                  <span class="text-brand-500 bg-brand-500/10 p-2 rounded-xl text-xs"><i class="fa-solid fa-user-plus"></i></span>
+                </div>
+                <div class="mt-4 flex items-baseline justify-between">
+                  <span id="stat-new-leads" class="text-3xl font-extrabold tracking-tight">0</span>
+                  <span class="text-xs text-emerald-500 font-semibold"><i class="fa-solid fa-arrow-trend-up"></i> +100%</span>
+                </div>
+                <div class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-brand-500 to-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              </div>
+
+              <!-- Follow Ups Due Card -->
+              <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 rounded-3xl relative overflow-hidden group hover:border-yellow-500/50 transition-all shadow-sm">
+                <div class="flex items-center justify-between">
+                  <span class="text-sm font-medium text-slate-500 dark:text-slate-400">Follow Up Hari Ini</span>
+                  <span class="text-yellow-500 bg-yellow-500/10 p-2 rounded-xl text-xs"><i class="fa-solid fa-clock"></i></span>
+                </div>
+                <div class="mt-4 flex items-baseline justify-between">
+                  <span id="stat-due-followups" class="text-3xl font-extrabold tracking-tight text-yellow-500">0</span>
+                  <span id="stat-due-subtext" class="text-xs text-yellow-500 font-semibold">Tugasan</span>
+                </div>
+                <div class="absolute bottom-0 left-0 right-0 h-1 bg-yellow-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              </div>
+
+              <!-- Closed Deals Card -->
+              <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 rounded-3xl relative overflow-hidden group hover:border-emerald-500/50 transition-all shadow-sm">
+                <div class="flex items-center justify-between">
+                  <span class="text-sm font-medium text-slate-500 dark:text-slate-400">Closed Deal</span>
+                  <span class="text-emerald-500 bg-emerald-500/10 p-2 rounded-xl text-xs"><i class="fa-solid fa-circle-check"></i></span>
+                </div>
+                <div class="mt-4 flex items-baseline justify-between">
+                  <span id="stat-closed-deals" class="text-3xl font-extrabold tracking-tight text-emerald-500">0</span>
+                  <span class="text-xs text-emerald-500 font-semibold"><i class="fa-solid fa-circle-dollar-to-slot"></i> Won</span>
+                </div>
+                <div class="absolute bottom-0 left-0 right-0 h-1 bg-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              </div>
+
+              <!-- Lost Leads Card -->
+              <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 rounded-3xl relative overflow-hidden group hover:border-red-500/50 transition-all shadow-sm">
+                <div class="flex items-center justify-between">
+                  <span class="text-sm font-medium text-slate-500 dark:text-slate-400">Lost Leads</span>
+                  <span class="text-red-500 bg-red-500/10 p-2 rounded-xl text-xs"><i class="fa-solid fa-user-xmark"></i></span>
+                </div>
+                <div class="mt-4 flex items-baseline justify-between">
+                  <span id="stat-lost-leads" class="text-3xl font-extrabold tracking-tight text-red-500">0</span>
+                  <span class="text-xs text-red-400 font-semibold">Closed Lost</span>
+                </div>
+                <div class="absolute bottom-0 left-0 right-0 h-1 bg-red-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Monthly Statistics & Conversion -->
+          <div>
+            <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-4">Statistik Bulanan (Monthly Statistics)</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-3xl shadow-sm flex items-center justify-between">
+                <div>
+                  <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Jumlah Leads Masuk</p>
+                  <h4 id="monthly-stat-total-leads" class="text-2xl font-black mt-2">0</h4>
+                </div>
+                <div class="w-12 h-12 rounded-2xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center"><i class="fa-solid fa-users text-xl"></i></div>
+              </div>
+
+              <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-3xl shadow-sm flex items-center justify-between">
+                <div>
+                  <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Jumlah Closed Deal</p>
+                  <h4 id="monthly-stat-closed-won" class="text-2xl font-black text-emerald-500 mt-2">0</h4>
+                </div>
+                <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center"><i class="fa-solid fa-handshake text-xl"></i></div>
+              </div>
+
+              <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-3xl shadow-sm flex items-center justify-between">
+                <div>
+                  <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Kadar Tukaran (Conversion Rate)</p>
+                  <h4 id="monthly-stat-conversion-rate" class="text-2xl font-black text-brand-500 mt-2">0%</h4>
+                </div>
+                <div class="w-12 h-12 rounded-2xl bg-brand-500/10 text-brand-500 flex items-center justify-center"><i class="fa-solid fa-percent text-xl"></i></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tasks & Leads Sections Grid -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Left Side: Follow up Checklist due today -->
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-3xl shadow-sm lg:col-span-1 flex flex-col">
+              <div class="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800 mb-4">
+                <h4 class="font-bold text-sm tracking-tight flex items-center space-x-2">
+                  <i class="fa-regular fa-calendar-check text-yellow-500"></i>
+                  <span>Follow Up Hari Ini</span>
+                </h4>
+                <a href="#followups" class="text-xs text-brand-500 hover:underline">Semua</a>
+              </div>
+              <div id="dash-followups-list" class="space-y-3 overflow-y-auto max-h-[350px] flex-1 pr-1">
+                <!-- Injected dynamically -->
+                <div class="text-xs text-slate-400 text-center py-8">Tiada tugasan follow up hari ini.</div>
+              </div>
+            </div>
+
+            <!-- Right Side: Recent Leads Section -->
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-3xl shadow-sm lg:col-span-2 flex flex-col">
+              <div class="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800 mb-4">
+                <h4 class="font-bold text-sm tracking-tight flex items-center space-x-2">
+                  <i class="fa-solid fa-address-book text-brand-500"></i>
+                  <span>Leads Terkini</span>
+                </h4>
+                <a href="#leads" class="text-xs text-brand-500 hover:underline">Semua Leads</a>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr class="text-slate-400 border-b border-slate-200 dark:border-slate-800 font-semibold uppercase tracking-wider">
+                      <th class="pb-3 font-semibold">Nama</th>
+                      <th class="pb-3 font-semibold">Niche & Produk</th>
+                      <th class="pb-3 font-semibold">Source</th>
+                      <th class="pb-3 font-semibold">Status</th>
+                      <th class="pb-3 font-semibold text-right">Tindakan</th>
+                    </tr>
+                  </thead>
+                  <tbody id="dash-recent-leads" class="divide-y divide-slate-100 dark:divide-slate-800/50">
+                    <!-- Injected dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- 2. LEADS MODULE VIEW -->
+        <!-- ========================================== -->
+        <section id="view-leads" class="view-panel hidden fade-in space-y-6">
+          <!-- Control Panel (Search, Filters, Create) -->
+          <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-3xl shadow-sm space-y-4">
+            <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
+              <!-- Search -->
+              <div class="relative w-full md:max-w-md">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                  <i class="fa-solid fa-magnifying-glass"></i>
+                </span>
+                <input type="text" id="lead-search" class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm" placeholder="Cari nama, telefon, emel atau produk...">
+              </div>
+              
+              <!-- Lead Stats Tracker on Module -->
+              <div class="flex items-center space-x-2 text-xs font-medium text-slate-500 dark:text-slate-400">
+                <span id="filtered-leads-count" class="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 rounded-full">0</span>
+                <span>leads ditemui</span>
+              </div>
+            </div>
+
+            <!-- Filters Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <!-- Niche Filter -->
+              <div>
+                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Niche</label>
+                <select id="filter-niche" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500">
+                  <option value="">Semua Niche</option>
+                  <!-- Injected dynamically -->
+                </select>
+              </div>
+
+              <!-- Source Filter -->
+              <div>
+                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Source</label>
+                <select id="filter-source" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500">
+                  <option value="">Semua Source</option>
+                  <!-- Injected dynamically -->
+                </select>
+              </div>
+
+              <!-- Status Filter -->
+              <div>
+                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Status</label>
+                <select id="filter-status" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500">
+                  <option value="">Semua Status</option>
+                  <!-- Injected dynamically -->
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Leads Card Grid -->
+          <div id="leads-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Injected dynamically -->
+          </div>
+          
+          <div id="leads-empty-state" class="text-center py-20 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl hidden">
+            <div class="w-16 h-16 bg-slate-100 dark:bg-slate-800 text-slate-400 rounded-full flex items-center justify-center mx-auto mb-4">
+              <i class="fa-solid fa-address-book text-2xl"></i>
+            </div>
+            <h4 class="font-bold text-lg">Tiada Leads Ditemui</h4>
+            <p class="text-sm text-slate-400 mt-1">Sila padamkan penapis carian atau tambah lead baru.</p>
+          </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- 3. LEAD DETAIL VIEW -->
+        <!-- ========================================== -->
+        <section id="view-lead-detail" class="view-panel hidden fade-in space-y-6">
+          <!-- Back button and Navigation -->
+          <div class="flex items-center justify-between">
+            <a href="#leads" class="text-sm font-semibold text-brand-500 hover:text-brand-600 flex items-center space-x-1">
+              <i class="fa-solid fa-arrow-left"></i>
+              <span>Kembali ke Senarai Leads</span>
+            </a>
+            
+            <div class="flex items-center space-x-2">
+              <button id="detail-edit-btn" class="p-2 px-3 border border-slate-200 dark:border-slate-800 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-semibold flex items-center space-x-1.5">
+                <i class="fa-solid fa-pen-to-square"></i>
+                <span>Kembali Edit</span>
+              </button>
+              <button id="detail-delete-btn" class="p-2 px-3 border border-red-500/30 hover:border-red-500 bg-red-500/5 hover:bg-red-500/10 text-red-500 rounded-xl text-xs font-semibold flex items-center space-x-1.5">
+                <i class="fa-solid fa-trash-can"></i>
+                <span>Padam</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Main Layout Grid: Left Profile Card, Right Activities / Notes -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Left Side: Profile Card & Quick Actions -->
+            <div class="lg:col-span-1 space-y-6">
+              <!-- Lead Info Card -->
+              <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-3xl shadow-sm relative">
+                <div class="absolute top-4 right-4" id="detail-status-badge">
+                  <!-- Injected badge -->
+                </div>
+                
+                <div class="flex flex-col items-center text-center mt-4">
+                  <div class="w-20 h-20 bg-brand-500/10 text-brand-500 rounded-full flex items-center justify-center font-bold text-3xl mb-4" id="detail-avatar">
+                    ZH
+                  </div>
+                  <h3 id="detail-name" class="text-xl font-bold tracking-tight">Mohd Zaim</h3>
+                  <p id="detail-niche" class="text-xs text-brand-500 font-semibold bg-brand-500/10 px-2.5 py-1 rounded-full mt-1.5">Hartanah</p>
+                </div>
+
+                <div class="mt-8 space-y-4 border-t border-slate-200 dark:border-slate-800 pt-6">
+                  <div>
+                    <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Nombor Telefon</span>
+                    <a href="#" id="detail-phone" class="text-sm font-semibold hover:text-brand-500 transition-colors flex items-center mt-1">
+                      <i class="fa-solid fa-phone text-xs text-slate-400 mr-2"></i> +60123456789
+                    </a>
+                  </div>
+
+                  <div>
+                    <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">E-mel</span>
+                    <span id="detail-email" class="text-sm font-semibold flex items-center mt-1">
+                      <i class="fa-solid fa-envelope text-xs text-slate-400 mr-2"></i> zaim@example.com
+                    </span>
+                  </div>
+
+                  <div>
+                    <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Produk Diminati</span>
+                    <span id="detail-product" class="text-sm font-semibold flex items-center mt-1">
+                      <i class="fa-solid fa-box-open text-xs text-slate-400 mr-2"></i> Semi-D Setia Alam
+                    </span>
+                  </div>
+
+                  <div>
+                    <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Punca Saluran (Source)</span>
+                    <span id="detail-source" class="text-sm font-semibold flex items-center mt-1">
+                      <i class="fa-solid fa-bullhorn text-xs text-slate-400 mr-2"></i> Facebook Ads
+                    </span>
+                  </div>
+
+                  <div class="grid grid-cols-2 gap-4 text-xs border-t border-slate-100 dark:border-slate-800/80 pt-4">
+                    <div>
+                      <span class="block font-bold text-slate-400 uppercase tracking-wider text-[9px]">Tarikh Ditambah</span>
+                      <span id="detail-date-added" class="block font-semibold mt-1">12 Jun 2026</span>
+                    </div>
+                    <div>
+                      <span class="block font-bold text-slate-400 uppercase tracking-wider text-[9px]">Hubungan Terakhir</span>
+                      <span id="detail-date-contacted" class="block font-semibold mt-1">19 Jun 2026</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Quick Communication Actions -->
+              <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-3xl shadow-sm space-y-3">
+                <h4 class="font-bold text-sm tracking-tight mb-4">Tindakan Pantas (Quick Actions)</h4>
+                
+                <!-- WhatsApp -->
+                <a href="#" id="action-whatsapp" target="_blank" class="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold flex items-center justify-center space-x-2 transition-colors shadow-md shadow-emerald-600/10">
+                  <i class="fa-brands fa-whatsapp text-lg"></i>
+                  <span>WhatsApp Lead</span>
+                </a>
+
+                <!-- Call -->
+                <a href="#" id="action-call" class="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold flex items-center justify-center space-x-2 transition-colors shadow-md shadow-blue-600/10">
+                  <i class="fa-solid fa-phone"></i>
+                  <span>Call Lead</span>
+                </a>
+
+                <!-- Status Update Trigger -->
+                <div class="relative pt-2">
+                  <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Tukar Status Lead</label>
+                  <select id="action-change-status" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    <!-- Injected options -->
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Side: Notes, Follow Up Schedules, Activity Logs -->
+            <div class="lg:col-span-2 space-y-6">
+              
+              <!-- Tab Control Header -->
+              <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-2 rounded-2xl shadow-sm flex items-center space-x-2">
+                <button class="detail-tab-btn flex-1 py-2.5 px-4 text-xs font-semibold rounded-xl bg-brand-500 text-white transition-all" data-tab="timeline">
+                  <i class="fa-solid fa-clock-rotate-left mr-1.5"></i> Aktiviti & Nota
+                </button>
+                <button class="detail-tab-btn flex-1 py-2.5 px-4 text-xs font-semibold rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-all" data-tab="followup">
+                  <i class="fa-regular fa-calendar-check mr-1.5"></i> Tugasan Follow Up
+                </button>
+              </div>
+
+              <!-- TIMELINE & NOTES TAB -->
+              <div id="tab-timeline" class="detail-tab-content space-y-6">
+                <!-- Notes and Actions -->
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-3xl shadow-sm space-y-4">
+                  <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
+                    <h4 class="font-bold text-sm">Nota Tambahan (Lead Notes)</h4>
+                    <button id="add-note-btn" class="text-xs text-brand-500 font-bold hover:underline">
+                      <i class="fa-solid fa-plus-circle mr-1"></i> Tambah Nota
+                    </button>
+                  </div>
+                  <div id="detail-notes-container" class="space-y-3 max-h-[220px] overflow-y-auto pr-1">
+                    <!-- Injected dynamically -->
+                  </div>
+                </div>
+
+                <!-- Activity Log -->
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-3xl shadow-sm">
+                  <h4 class="font-bold text-sm pb-3 border-b border-slate-200 dark:border-slate-800 mb-6">Garis Masa Aktiviti (Activity Timeline)</h4>
+                  
+                  <div class="relative border-l border-slate-200 dark:border-slate-800 ml-3.5 space-y-6" id="detail-activity-timeline">
+                    <!-- Injected dynamically -->
+                  </div>
+                </div>
+              </div>
+
+              <!-- FOLLOW UPS TAB -->
+              <div id="tab-followup" class="detail-tab-content space-y-6 hidden">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-3xl shadow-sm space-y-6">
+                  <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
+                    <h4 class="font-bold text-sm">Jadual Follow Up</h4>
+                    <button id="schedule-followup-btn" class="bg-brand-500/10 hover:bg-brand-500/20 text-brand-500 py-1.5 px-3 rounded-lg text-xs font-bold transition-colors">
+                      <i class="fa-solid fa-calendar-plus mr-1"></i> Jadualkan Baru
+                    </button>
+                  </div>
+
+                  <div id="detail-followups-list" class="space-y-4">
+                    <!-- Injected dynamically -->
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- 4. FOLLOW UP MODULE VIEW -->
+        <!-- ========================================== -->
+        <section id="view-followups" class="view-panel hidden fade-in space-y-6">
+          <!-- Calendar and List View Selectors -->
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-1.5 rounded-2xl shadow-sm flex items-center space-x-1.5">
+              <button class="followup-view-btn py-2 px-4 text-xs font-semibold rounded-xl bg-brand-500 text-white transition-all" data-view-mode="list">
+                <i class="fa-solid fa-list-check mr-1.5"></i> Senarai Tugasan (List)
+              </button>
+              <button class="followup-view-btn py-2 px-4 text-xs font-semibold rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-all" data-view-mode="calendar">
+                <i class="fa-regular fa-calendar-days mr-1.5"></i> Kalendar (Calendar)
+              </button>
+            </div>
+
+            <!-- Quick stats count -->
+            <div class="flex items-center space-x-3 text-xs">
+              <span id="followups-overdue-badge" class="px-2.5 py-1 bg-red-500/10 text-red-500 font-semibold rounded-full hidden">0 Overdue</span>
+              <span id="followups-pending-badge" class="px-2.5 py-1 bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 font-semibold rounded-full">0 Pending</span>
+            </div>
+          </div>
+
+          <!-- LIST VIEW LAYOUT -->
+          <div id="followups-list-view" class="space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              
+              <!-- Overdue Followups Column -->
+              <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-3xl shadow-sm flex flex-col min-h-[400px]">
+                <h4 class="font-bold text-sm text-red-500 border-b border-slate-200 dark:border-slate-800 pb-3 mb-4 flex items-center justify-between">
+                  <span>Overdue (Tunggakan)</span>
+                  <span id="count-overdue" class="px-2 py-0.5 bg-red-500/15 text-red-500 rounded text-xs font-bold">0</span>
+                </h4>
+                <div id="followups-overdue-list" class="space-y-3 overflow-y-auto flex-1 max-h-[500px]">
+                  <!-- Injected dynamically -->
+                </div>
+              </div>
+
+              <!-- Upcoming / Today Followups Column -->
+              <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-3xl shadow-sm flex flex-col min-h-[400px]">
+                <h4 class="font-bold text-sm text-yellow-600 dark:text-yellow-400 border-b border-slate-200 dark:border-slate-800 pb-3 mb-4 flex items-center justify-between">
+                  <span>Mendatang / Hari Ini</span>
+                  <span id="count-upcoming" class="px-2 py-0.5 bg-yellow-500/15 text-yellow-600 dark:text-yellow-400 rounded text-xs font-bold">0</span>
+                </h4>
+                <div id="followups-upcoming-list" class="space-y-3 overflow-y-auto flex-1 max-h-[500px]">
+                  <!-- Injected dynamically -->
+                </div>
+              </div>
+
+              <!-- Completed Followups Column -->
+              <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-3xl shadow-sm flex flex-col min-h-[400px]">
+                <h4 class="font-bold text-sm text-emerald-500 border-b border-slate-200 dark:border-slate-800 pb-3 mb-4 flex items-center justify-between">
+                  <span>Selesai (Completed)</span>
+                  <span id="count-completed" class="px-2 py-0.5 bg-emerald-500/15 text-emerald-500 rounded text-xs font-bold">0</span>
+                </h4>
+                <div id="followups-completed-list" class="space-y-3 overflow-y-auto flex-1 max-h-[500px]">
+                  <!-- Injected dynamically -->
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- CALENDAR VIEW LAYOUT -->
+          <div id="followups-calendar-view" class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-3xl shadow-sm hidden">
+            <!-- Calendar Navigation Header -->
+            <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-200 dark:border-slate-800">
+              <h4 id="calendar-month-year" class="font-bold text-lg">Jun 2026</h4>
+              <div class="flex items-center space-x-2">
+                <button id="cal-prev-month" class="w-9 h-9 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl flex items-center justify-center transition-colors">
+                  <i class="fa-solid fa-chevron-left text-xs"></i>
+                </button>
+                <button id="cal-today" class="px-3 py-1.5 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl text-xs font-semibold transition-colors">
+                  Hari Ini
+                </button>
+                <button id="cal-next-month" class="w-9 h-9 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl flex items-center justify-center transition-colors">
+                  <i class="fa-solid fa-chevron-right text-xs"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Calendar Month Grid -->
+            <div>
+              <!-- Days Header -->
+              <div class="grid grid-cols-7 text-center font-bold text-xs uppercase tracking-wider text-slate-400 mb-2">
+                <div>Ahad</div>
+                <div>Isnin</div>
+                <div>Selasa</div>
+                <div>Rabu</div>
+                <div>Khamis</div>
+                <div>Jumaat</div>
+                <div>Sabtu</div>
+              </div>
+
+              <!-- Dates Grid Container -->
+              <div id="calendar-days-grid" class="grid grid-cols-7 gap-1 border-t border-l border-slate-100 dark:border-slate-800/80 bg-slate-100 dark:bg-slate-800/20">
+                <!-- Injected dynamically -->
+              </div>
+            </div>
+
+            <!-- Selected Date Events Drawer -->
+            <div class="mt-8 border-t border-slate-200 dark:border-slate-800 pt-6">
+              <h5 class="font-bold text-xs uppercase text-slate-400 tracking-wider mb-4 flex items-center">
+                <i class="fa-solid fa-list-ul mr-2 text-brand-500"></i>
+                <span>Tugasan pada <span id="calendar-selected-date-text">20 Jun 2026</span></span>
+              </h5>
+              <div id="calendar-selected-events" class="space-y-3">
+                <!-- Injected dynamically -->
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- 5. ANALYTICS VIEW -->
+        <!-- ========================================== -->
+        <section id="view-analytics" class="view-panel hidden fade-in space-y-6">
+          
+          <!-- Charts Grid Layout -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <!-- Leads by Source Chart -->
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-3xl shadow-sm flex flex-col justify-between min-h-[350px]">
+              <h4 class="font-bold text-sm tracking-tight mb-4 flex items-center justify-between">
+                <span>Leads Ikut Sumber (Leads by Source)</span>
+                <i class="fa-solid fa-bullhorn text-slate-400"></i>
+              </h4>
+              <div class="flex-1 relative flex items-center justify-center max-h-[250px]">
+                <canvas id="chart-leads-by-source"></canvas>
+              </div>
+            </div>
+
+            <!-- Leads by Niche Chart -->
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-3xl shadow-sm flex flex-col justify-between min-h-[350px]">
+              <h4 class="font-bold text-sm tracking-tight mb-4 flex items-center justify-between">
+                <span>Leads Ikut Niche (Leads by Niche)</span>
+                <i class="fa-solid fa-network-wired text-slate-400"></i>
+              </h4>
+              <div class="flex-1 relative flex items-center justify-center max-h-[250px]">
+                <canvas id="chart-leads-by-niche"></canvas>
+              </div>
+            </div>
+
+            <!-- Leads by Status Chart -->
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-3xl shadow-sm flex flex-col justify-between min-h-[350px]">
+              <h4 class="font-bold text-sm tracking-tight mb-4 flex items-center justify-between">
+                <span>Status Leads (Leads by Status)</span>
+                <i class="fa-solid fa-chart-pie text-slate-400"></i>
+              </h4>
+              <div class="flex-1 relative flex items-center justify-center max-h-[250px]">
+                <canvas id="chart-leads-by-status"></canvas>
+              </div>
+            </div>
+
+            <!-- Trend conversion Chart -->
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-3xl shadow-sm flex flex-col justify-between min-h-[350px]">
+              <h4 class="font-bold text-sm tracking-tight mb-4 flex items-center justify-between">
+                <span>Trend Bulanan Leads (Monthly Trends)</span>
+                <i class="fa-solid fa-chart-line text-slate-400"></i>
+              </h4>
+              <div class="flex-1 relative flex items-center justify-center max-h-[250px]">
+                <canvas id="chart-leads-monthly-trend"></canvas>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Best Performance Tables -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            <!-- Best Performing Source -->
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-3xl shadow-sm">
+              <h4 class="font-bold text-sm mb-4 border-b border-slate-100 dark:border-slate-800/80 pb-3">Sumber Paling Banyak Deal Won (Best Sources)</h4>
+              <div class="overflow-x-auto">
+                <table class="w-full text-xs text-left">
+                  <thead>
+                    <tr class="text-slate-400 border-b border-slate-100 dark:border-slate-800 font-semibold uppercase tracking-wider">
+                      <th class="pb-2">Punca Saluran</th>
+                      <th class="pb-2 text-center">Jumlah Deal Won</th>
+                      <th class="pb-2 text-center">Kadar Kejayaan</th>
+                    </tr>
+                  </thead>
+                  <tbody id="analytics-table-source" class="divide-y divide-slate-100 dark:divide-slate-800/50">
+                    <!-- Injected dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Total Leads by Niche Table -->
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-3xl shadow-sm">
+              <h4 class="font-bold text-sm mb-4 border-b border-slate-100 dark:border-slate-800/80 pb-3 font-bold">Prestasi Niche (Niche Breakdown)</h4>
+              <div class="overflow-x-auto">
+                <table class="w-full text-xs text-left">
+                  <thead>
+                    <tr class="text-slate-400 border-b border-slate-100 dark:border-slate-800 font-semibold uppercase tracking-wider">
+                      <th class="pb-2">Nama Niche</th>
+                      <th class="pb-2 text-center">Jumlah Leads</th>
+                      <th class="pb-2 text-center">Deal Won</th>
+                    </tr>
+                  </thead>
+                  <tbody id="analytics-table-niche" class="divide-y divide-slate-100 dark:divide-slate-800/50">
+                    <!-- Injected dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- 6. SETTINGS VIEW -->
+        <!-- ========================================== -->
+        <section id="view-settings" class="view-panel hidden fade-in space-y-6">
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Left Panel: User Profile & Security -->
+            <div class="lg:col-span-1 space-y-6">
+              
+              <!-- Profile Panel -->
+              <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-3xl shadow-sm space-y-4">
+                <h4 class="font-bold text-sm mb-4 pb-3 border-b border-slate-150 dark:border-slate-800 flex items-center">
+                  <i class="fa-regular fa-id-card mr-2 text-brand-500"></i>
+                  <span>Profil Pengguna (Profile)</span>
+                </h4>
+                
+                <form id="settings-profile-form" class="space-y-4">
+                  <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Nama Penuh</label>
+                    <input type="text" id="set-profile-name" required class="w-full px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500">
+                  </div>
+                  <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Alamat Emel</label>
+                    <input type="email" id="set-profile-email" required class="w-full px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500">
+                  </div>
+                  <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Nama Syarikat / Organisasi</label>
+                    <input type="text" id="set-profile-company" required class="w-full px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500">
+                  </div>
+                  <button type="submit" class="w-full py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-semibold transition-colors">
+                    Simpan Profil
+                  </button>
+                </form>
+              </div>
+
+              <!-- Local PIN Security -->
+              <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-3xl shadow-sm space-y-4">
+                <h4 class="font-bold text-sm mb-4 pb-3 border-b border-slate-150 dark:border-slate-800 flex items-center">
+                  <i class="fa-solid fa-user-shield mr-2 text-brand-500"></i>
+                  <span>Keselamatan Portal (Lock PIN)</span>
+                </h4>
+                
+                <form id="settings-security-form" class="space-y-4">
+                  <p class="text-[11px] text-slate-400">Masukkan PIN/Kata Laluan jika ingin menyekat kemasukan local ke portal CRM ini.</p>
+                  <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Kunci PIN Baru (Min 4 digit)</label>
+                    <input type="password" id="set-app-passcode" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500" placeholder="Biarkan kosong untuk padam PIN">
+                  </div>
+                  <button type="submit" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-semibold transition-colors">
+                    Kemaskini PIN
+                  </button>
+                </form>
+              </div>
+
+            </div>
+
+            <!-- Right Panel: Database Sync & Custom Dropdowns Configuration -->
+            <div class="lg:col-span-2 space-y-6">
+              
+              <!-- Google Apps Script Setup & Sync -->
+              <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-3xl shadow-sm space-y-4">
+                <h4 class="font-bold text-sm mb-4 pb-3 border-b border-slate-150 dark:border-slate-800 flex items-center justify-between">
+                  <span class="flex items-center"><i class="fa-solid fa-cloud-arrow-up mr-2 text-brand-500"></i> Google Sheet Backend Sync</span>
+                  <span class="text-[10px] bg-indigo-500/10 text-indigo-500 font-semibold px-2 py-0.5 rounded-full">Pro Feature</span>
+                </h4>
+                
+                <p class="text-xs text-slate-400">Pautkan CRM local ini dengan hamparan Google Sheets anda. Rujuk fail <code>README.md</code> untuk arahan penyediaan script backend.</p>
+
+                <div class="space-y-4">
+                  <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Google Apps Script Web App URL</label>
+                    <input type="url" id="set-gas-url" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500" placeholder="https://script.google.com/macros/s/.../exec">
+                  </div>
+
+                  <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Passcode API (Jika Dikira)</label>
+                    <input type="password" id="set-gas-passcode" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500" placeholder="Gunakan jika Code.js mengaktifkan API_PASSCODE">
+                  </div>
+
+                  <div class="grid grid-cols-2 gap-3 pt-2">
+                    <button id="settings-test-conn" class="py-2.5 px-4 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700/80 text-slate-700 dark:text-slate-200 rounded-xl text-xs font-semibold transition-colors flex items-center justify-center space-x-1.5">
+                      <i class="fa-solid fa-network-wired"></i>
+                      <span>Uji Sambungan</span>
+                    </button>
+                    <button id="settings-sync-now" class="py-2.5 px-4 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-semibold transition-colors flex items-center justify-center space-x-1.5 shadow-md shadow-brand-600/10">
+                      <i class="fa-solid fa-cloud-arrow-up"></i>
+                      <span>Sync Data Sekarang</span>
+                    </button>
+                  </div>
+                  
+                  <div id="sync-console-output" class="text-[11px] font-mono bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-3 rounded-lg hidden whitespace-pre-line">
+                    Console log output goes here...
+                  </div>
+                </div>
+              </div>
+
+              <!-- Custom Options (Niche and Source Lists) -->
+              <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-3xl shadow-sm space-y-6">
+                <h4 class="font-bold text-sm pb-3 border-b border-slate-150 dark:border-slate-800">Urus Parameter Dropdown</h4>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  
+                  <!-- Custom Niches list -->
+                  <div class="space-y-3">
+                    <h5 class="font-bold text-xs uppercase text-slate-400 tracking-wider">Senarai Niche Perniagaan</h5>
+                    <div class="flex space-x-2">
+                      <input type="text" id="new-niche-input" class="flex-1 px-3 py-2 border border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50 dark:bg-slate-950 text-xs focus:outline-none" placeholder="Tambah Niche baru...">
+                      <button id="add-niche-btn" class="px-3 bg-brand-500 text-white rounded-xl text-xs font-semibold"><i class="fa-solid fa-plus"></i></button>
+                    </div>
+                    <ul id="settings-niche-list" class="space-y-1.5 max-h-[180px] overflow-y-auto pr-1">
+                      <!-- Injected dynamically -->
+                    </ul>
+                  </div>
+
+                  <!-- Custom Sources list -->
+                  <div class="space-y-3">
+                    <h5 class="font-bold text-xs uppercase text-slate-400 tracking-wider">Senarai Punca Saluran (Source)</h5>
+                    <div class="flex space-x-2">
+                      <input type="text" id="new-source-input" class="flex-1 px-3 py-2 border border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50 dark:bg-slate-950 text-xs focus:outline-none" placeholder="Tambah Source baru...">
+                      <button id="add-source-btn" class="px-3 bg-brand-500 text-white rounded-xl text-xs font-semibold"><i class="fa-solid fa-plus"></i></button>
+                    </div>
+                    <ul id="settings-source-list" class="space-y-1.5 max-h-[180px] overflow-y-auto pr-1">
+                      <!-- Injected dynamically -->
+                    </ul>
+                  </div>
+
+                </div>
+              </div>
+
+              <!-- Backup, Restore, and Reset Panel -->
+              <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-3xl shadow-sm space-y-4">
+                <h4 class="font-bold text-sm text-red-500 pb-3 border-b border-red-500/10">Sistem & Pangkalan Data (Advanced)</h4>
+                <div class="flex flex-wrap gap-3">
+                  <button id="db-export" class="py-2 px-4 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-850 rounded-xl text-xs font-semibold transition-colors">
+                    <i class="fa-solid fa-download mr-1"></i> Eksport JSON
+                  </button>
+                  <label class="py-2 px-4 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-850 rounded-xl text-xs font-semibold cursor-pointer transition-colors">
+                    <i class="fa-solid fa-upload mr-1"></i> Import JSON
+                    <input type="file" id="db-import-file" class="hidden" accept=".json">
+                  </label>
+                  <button id="db-reset" class="py-2 px-4 bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/25 rounded-xl text-xs font-semibold transition-colors ml-auto">
+                    <i class="fa-solid fa-triangle-exclamation mr-1"></i> Reset Ke Asal (Wipe Data)
+                  </button>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        </section>
+
+      </div>
+    </main>
+
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL: ADD / EDIT LEAD -->
+  <!-- ========================================== -->
+  <div id="lead-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm hidden">
+    <div class="w-full max-w-lg p-6 m-4 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl transition-all max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800 mb-4">
+        <h4 id="lead-modal-title" class="text-base font-bold">Tambah Lead Baru</h4>
+        <button class="lead-modal-close text-slate-400 hover:text-slate-500 focus:outline-none">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <form id="lead-form" class="space-y-4">
+        <input type="hidden" id="lead-form-id">
+        <input type="hidden" id="lead-form-date-added">
+        
+        <!-- Basic Info Section -->
+        <div class="space-y-3">
+          <h5 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Maklumat Asas</h5>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[10px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Nama Lead *</label>
+              <input type="text" id="lead-form-name" required class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500">
+            </div>
+            <div>
+              <label class="block text-[10px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Telefon *</label>
+              <input type="tel" id="lead-form-phone" required placeholder="Contoh: +60123456789" class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500">
+            </div>
+          </div>
+          <div>
+            <label class="block text-[10px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Alamat Emel (Opsional)</label>
+            <input type="email" id="lead-form-email" class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500">
+          </div>
+        </div>
+
+        <!-- Business details Section -->
+        <div class="space-y-3 pt-2">
+          <h5 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Butiran Urus Niaga</h5>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[10px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Niche Sasaran *</label>
+              <select id="lead-form-niche" required class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500">
+                <!-- Injected dynamically -->
+              </select>
+            </div>
+            <div>
+              <label class="block text-[10px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Produk Diminati *</label>
+              <input type="text" id="lead-form-product" required placeholder="Contoh: Pakej Renovation Dapur" class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500">
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[10px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Punca Lead (Source) *</label>
+              <select id="lead-form-source" required class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500">
+                <!-- Injected dynamically -->
+              </select>
+            </div>
+            <div>
+              <label class="block text-[10px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Status Lead *</label>
+              <select id="lead-form-status" required class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500">
+                <!-- Injected dynamically -->
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Notes and textareas -->
+        <div class="space-y-3 pt-2">
+          <h5 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Nota / Komen Ringkas</h5>
+          <div>
+            <textarea id="lead-form-notes" rows="3" placeholder="Masukkan sebarang ulasan awal..." class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500"></textarea>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end space-x-2 pt-4 border-t border-slate-200 dark:border-slate-800">
+          <button type="button" class="lead-modal-close py-2 px-4 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-850 rounded-xl text-xs font-semibold">
+            Batal
+          </button>
+          <button type="submit" class="py-2.5 px-5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-semibold shadow-md shadow-brand-600/10">
+            Simpan Lead
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL: SCHEDULE FOLLOW-UP -->
+  <!-- ========================================== -->
+  <div id="followup-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm hidden">
+    <div class="w-full max-w-md p-6 m-4 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl transition-all">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800 mb-4">
+        <h4 id="followup-modal-title" class="text-base font-bold">Jadualkan Follow Up</h4>
+        <button class="followup-modal-close text-slate-400 hover:text-slate-500 focus:outline-none">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <form id="followup-form" class="space-y-4">
+        <input type="hidden" id="followup-form-id">
+        <input type="hidden" id="followup-form-lead-id">
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[10px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Tarikh *</label>
+            <input type="date" id="followup-form-date" required class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500">
+          </div>
+          <div>
+            <label class="block text-[10px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Waktu *</label>
+            <input type="time" id="followup-form-time" required class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-[10px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Ulasan / Nota Follow Up *</label>
+          <textarea id="followup-form-note" rows="3" required placeholder="Sebut tujuan/pencapaian yang dimahukan daripada follow-up ini..." class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500"></textarea>
+        </div>
+
+        <div class="flex items-center justify-end space-x-2 pt-4 border-t border-slate-200 dark:border-slate-800">
+          <button type="button" class="followup-modal-close py-2 px-4 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-850 rounded-xl text-xs font-semibold">
+            Batal
+          </button>
+          <button type="submit" class="py-2.5 px-5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-semibold shadow-md shadow-brand-600/10">
+            Jadualkan
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL: ADD LEAD NOTE -->
+  <!-- ========================================== -->
+  <div id="note-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm hidden">
+    <div class="w-full max-w-md p-6 m-4 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl transition-all">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800 mb-4">
+        <h4 class="text-base font-bold">Tambah Nota Lead</h4>
+        <button class="note-modal-close text-slate-400 hover:text-slate-500 focus:outline-none">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <form id="note-form" class="space-y-4">
+        <input type="hidden" id="note-form-lead-id">
+        <div>
+          <label class="block text-[10px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Kandungan Nota *</label>
+          <textarea id="note-form-content" rows="4" required placeholder="Tuliskan nota interaksi baru..." class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500"></textarea>
+        </div>
+
+        <div class="flex items-center justify-end space-x-2 pt-4 border-t border-slate-200 dark:border-slate-800">
+          <button type="button" class="note-modal-close py-2 px-4 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-850 rounded-xl text-xs font-semibold">
+            Batal
+          </button>
+          <button type="submit" class="py-2.5 px-5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-semibold shadow-md shadow-brand-600/10">
+            Simpan Nota
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Main JavaScript App Controller -->
+  <script src="api.js"></script>
+  <script src="app.js"></script>
+  <script>
+    // Register Service Worker for PWA if supported
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+          .then(reg => console.log('Service Worker registered successfully!', reg.scope))
+          .catch(err => console.log('Service Worker registration failed: ', err));
+      });
+    }
+  </script>
+</body>
+</html>
